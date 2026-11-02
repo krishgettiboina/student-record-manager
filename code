@@ -1,0 +1,138 @@
+import java.util.ArrayList;
+import java.util.Scanner;
+
+// Represents one student. Fields are private (encapsulation); access is through methods.
+class Student {
+    private int rollNo;
+    private String name;
+    private double marks;
+
+    public Student(int rollNo, String name, double marks) {
+        this.rollNo = rollNo;
+        this.name = name;
+        this.marks = marks;
+    }
+
+    public int getRollNo() { return rollNo; }
+    public String getName() { return name; }
+    public double getMarks() { return marks; }
+    public void setName(String name) { this.name = name; }
+    public void setMarks(double marks) { this.marks = marks; }
+
+    @Override
+    public String toString() {
+        return "Roll No: " + rollNo + " | Name: " + name + " | Marks: " + marks;
+    }
+}
+
+// Manages the list of students and the console menu.
+public class StudentRecordManager {
+    // ArrayList stores students and grows automatically.
+    private static ArrayList<Student> students = new ArrayList<>();
+    private static Scanner sc = new Scanner(System.in);
+
+    public static void main(String[] args) {
+        int choice;
+        do {
+            System.out.println("\n--- Student Record Manager (by Jaikrish) ---");
+            System.out.println("1. Add student");
+            System.out.println("2. View all students");
+            System.out.println("3. Search by roll number");
+            System.out.println("4. Update student");
+            System.out.println("5. Delete student");
+            System.out.println("6. Exit");
+            choice = readInt("Enter choice: ");
+
+            switch (choice) {
+                case 1: addStudent(); break;
+                case 2: viewAll(); break;
+                case 3: searchStudent(); break;
+                case 4: updateStudent(); break;
+                case 5: deleteStudent(); break;
+                case 6: System.out.println("Goodbye!"); break;
+                default: System.out.println("Invalid choice. Try 1-6.");
+            }
+        } while (choice != 6);
+    }
+
+    // Reads an integer safely. Exception handling stops the program crashing on bad input.
+    private static int readInt(String prompt) {
+        while (true) {
+            System.out.print(prompt);
+            try {
+                return Integer.parseInt(sc.nextLine().trim());
+            } catch (NumberFormatException e) {
+                System.out.println("Please enter a whole number.");
+            }
+        }
+    }
+
+    private static double readMarks() {
+        while (true) {
+            System.out.print("Enter marks (0-100): ");
+            try {
+                double m = Double.parseDouble(sc.nextLine().trim());
+                if (m >= 0 && m <= 100) return m;
+                System.out.println("Marks must be between 0 and 100.");
+            } catch (NumberFormatException e) {
+                System.out.println("Please enter a valid number.");
+            }
+        }
+    }
+
+    // Returns the student with this roll number, or null if not found.
+    private static Student find(int rollNo) {
+        for (Student s : students) {
+            if (s.getRollNo() == rollNo) return s;
+        }
+        return null;
+    }
+
+    private static void addStudent() {
+        int roll = readInt("Enter roll number: ");
+        if (find(roll) != null) {
+            System.out.println("A student with this roll number already exists.");
+            return;
+        }
+        System.out.print("Enter name: ");
+        String name = sc.nextLine().trim();
+        double marks = readMarks();
+        students.add(new Student(roll, name, marks));
+        System.out.println("Student added.");
+    }
+
+    private static void viewAll() {
+        if (students.isEmpty()) {
+            System.out.println("No records yet.");
+            return;
+        }
+        for (Student s : students) System.out.println(s);
+    }
+
+    private static void searchStudent() {
+        Student s = find(readInt("Enter roll number to search: "));
+        System.out.println(s != null ? s : "Student not found.");
+    }
+
+    private static void updateStudent() {
+        Student s = find(readInt("Enter roll number to update: "));
+        if (s == null) {
+            System.out.println("Student not found.");
+            return;
+        }
+        System.out.print("Enter new name: ");
+        s.setName(sc.nextLine().trim());
+        s.setMarks(readMarks());
+        System.out.println("Record updated.");
+    }
+
+    private static void deleteStudent() {
+        Student s = find(readInt("Enter roll number to delete: "));
+        if (s == null) {
+            System.out.println("Student not found.");
+        } else {
+            students.remove(s);
+            System.out.println("Record deleted.");
+        }
+    }
+}
